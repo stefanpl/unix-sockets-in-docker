@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  socketserver_1:
+    user: node
+    image: node:12-alpine
+    command: sh -c "cd /app && npm install && node /app/socketServer.js some.sock"
+    volumes:
+      - ./:/app
+  socketserver_2:
+    user: node
+    image: node:12-alpine
+    command: sh -c "cd /app && npm install && node /app/socketServer.js another.sock"
+    volumes:
+      - ./:/app
+  webserver:
+    image: nginx
+    volumes: 
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./sockets:/etc/nginx/sockets
+    ports:
+      - 1337:80
+    command: bash -c "chmod 777 /etc/nginx/sockets/* && nginx -g 'daemon off;'"
